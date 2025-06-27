@@ -1,66 +1,86 @@
-## Foundry
+# MultiUSD (USDM)
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
+Synthetic on-chain USD-pegged stablecoin, free of any blocks.
 
-Foundry consists of:
+Author: @stanta  
+License: GPL-3.0
 
--   **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
--   **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
--   **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
--   **Chisel**: Fast, utilitarian, and verbose solidity REPL.
+Built with [Foundry](https://github.com/foundry-rs/foundry).
 
-## Documentation
+## Overview
+ 
+USDM is a standard ERC20 token with on-chain mint and burn functionality,pegged to uniswap-like DEX pools to keep native coin (ETH, BNB, POL, etc...) to USDT+USDC+... exchange ratio
 
-https://book.getfoundry.sh/
+It leverages OpenZeppelin’s battle-tested implementations:
+
+- ERC20
+- ERC20Burnable
+
+Key features:
+
+- mint any amount to any address
+- burn your own tokens
+
+
+## Installation
+
+```bash
+git clone https://github.com/stanta/MultiUSD.git
+cd MultiUSD
+forge install
+forge build
+```
 
 ## Usage
 
 ### Build
 
-```shell
-$ forge build
+```bash
+forge build
 ```
 
 ### Test
 
-```shell
-$ forge test
+```bash
+forge test
 ```
 
 ### Format
 
-```shell
-$ forge fmt
+```bash
+forge fmt
 ```
 
 ### Gas Snapshots
 
-```shell
-$ forge snapshot
+```bash
+forge snapshot
 ```
 
-### Anvil
+### Local Node
 
-```shell
-$ anvil
+```bash
+anvil
 ```
 
 ### Deploy
 
-```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
+```bash
+forge script script/USDM.s.sol:USDMScript \
+  --rpc-url <YOUR_RPC_URL> \
+  --private-key <YOUR_PRIVATE_KEY>
 ```
 
 ### Cast
 
-```shell
-$ cast <subcommand>
+```bash
+cast <subcommand>
 ```
 
 ### Help
 
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
+```bash
+forge --help
+anvil --help
+cast --help
 ```
