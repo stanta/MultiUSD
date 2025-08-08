@@ -2,9 +2,33 @@
 src = "src"
 out = "out"
 libs = ["lib"]
+test = "test"
+
+# RPC URLs for forking tests
+eth_rpc_url = "https://rpc.ankr.com/eth"
+bsc_rpc_url = "https://rpc.ankr.com/bsc" 
+polygon_rpc_url = "https://rpc.ankr.com/polygon"
+
+# Optimizer settings
+optimizer = true
+optimizer_runs = 200
+
+# Additional settings for testing
+gas_limit = 9223372036854775807
+gas_price = 20000000000
+
+# Fuzz testing configuration
+fuzz = { runs = 1000 }
+
+# Coverage settings
+[profile.coverage]
+match_coverage = "src/**/*.sol"
 
 remappings = [
   "@openzeppelin-contracts/=lib/openzeppelin-contracts/",
-  "@UniSwapV2/=lib/UniV2/"
+  "@UniSwapV2/=lib/UniV2/",
+  "UniV2/contracts/=lib/UniV2/contracts/",
+  "@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/",
+  "UniSwapV2/contracts/=lib/v2-core/contracts/",
 ]
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
