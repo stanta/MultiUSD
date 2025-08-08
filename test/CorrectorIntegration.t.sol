@@ -1,11 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity ^0.8.24;
 
-/**
- * @title CorrectorIntegrationTest
- * @dev Интеграционные тесты для Corrector с простыми моками для быстрого тестирования
- * Тестирует расчет средних курсов стейблкоинов и арбитражные операции USDM
- */
 import {Test, console} from "forge-std/Test.sol";
 import {Corrector} from "../src/Corrector.sol";
 import {USDM} from "../src/USDM.sol";
@@ -18,15 +13,12 @@ import "UniV2/interfaces/IUniswapV2Factory.sol";
  * @dev Интеграционные тесты для Corrector с использованием форка мейннета
  * Тестирует расчет средних курсов стейблкоинов и арбитражные операции USDM
  */
-
-
-
 contract CorrectorIntegrationTest is Test {
     Corrector public corrector;
     USDM public usdm;
     
     // Mainnet addresses - Ethereum
-    address constant WETH = 0xC02aaa39B223Fe8C0624B628F63C3D6297C4AF45;
+    address constant WETH = 0xC02AaA39B223Fe8d0625B628f63C3D6297C4af45;
     address constant USDC = 0xA0B86a33E6c28c4c32b1c5b6a0A5E3b9b6f7c8e9; // Example USDC  
     address constant USDT = 0xdAC17F958D2ee523a2206206994597C13D831ec7;
     address constant UNISWAP_V2_FACTORY = 0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f;
@@ -202,7 +194,7 @@ contract CorrectorIntegrationTest is Test {
     /**
      * @dev Тест множественных AMM пулов
      */
-    function testMultipleAMMPools() public {
+    function testMultipleAMMPools() public view {
         console.log("=== Testing Multiple AMM Pools ===");
         
         // Check that we have multiple active pools
@@ -225,7 +217,7 @@ contract CorrectorIntegrationTest is Test {
     /**
      * @dev Тест граничных случаев
      */
-    function testEdgeCases() public {
+    function testEdgeCases() public pure {
         console.log("=== Testing Edge Cases ===");
         
         // Test with very small reserves
@@ -243,7 +235,7 @@ contract CorrectorIntegrationTest is Test {
     /**
      * @dev Тест производительности с большим количеством пулов
      */
-    function testPerformanceWithManyPools() public {
+    function testPerformanceWithManyPools() public view {
         console.log("=== Testing Performance with Many Pools ===");
         
         uint256 gasBefore = gasleft();
@@ -378,7 +370,7 @@ contract CorrectorIntegrationTest is Test {
     /**
      * @dev Тест восстановления после ошибок
      */
-    function testErrorRecovery() public  { //TODO 
+    function testErrorRecovery() public pure { //TODO 
         console.log("=== Testing Error Recovery ===");
         
         // Test behavior when pools have zero reserves

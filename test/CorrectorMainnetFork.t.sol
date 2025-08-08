@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity ^0.8.24;
 
-import {Test, console} from "forge-std/Test.sol";
+import {Test, console2, console} from "forge-std/Test.sol";
 import {Corrector} from "../src/Corrector.sol";
 import {USDM} from "../src/USDM.sol";
 
@@ -14,8 +14,8 @@ contract CorrectorMainnetForkTest is Test {
     USDM public usdm;
     
     // Ethereum mainnet addresses
-    address constant WETH = 0xC02aaA39b223FE8D0625B628f63C3D6297C4AF45;
-    address constant USDC = 0xA0b86a33E6c28c4c32b1c5b6a0A5E3b9b6f7c8e9;
+    address constant WETH = 0xC02AaA39B223Fe8d0625B628f63C3D6297C4af45;
+    address constant USDC = 0xA0B86a33E6c28c4c32b1c5b6a0A5E3b9b6f7c8e9;
     address constant USDT = 0xdAC17F958D2ee523a2206206994597C13D831ec7;
     address constant UNISWAP_V2_FACTORY = 0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f;
     address constant SUSHISWAP_FACTORY = 0xC0AEe478e3658e2610c5F7A4A2E1777cE9e4f2Ac;
@@ -267,8 +267,11 @@ contract CorrectorMainnetForkTest is Test {
         protocolCorrector.addAmm(factory, WETH, USDC, 2, false);
         
         try protocolCorrector.getAllStableRate() returns (uint256 totalNative, uint256 totalStable) {
-            console.log(protocolName, "reserves - Native:", totalNative, "Stable:", totalStable);
+            console.log(protocolName, "reserves - Native:", totalNative / 1e18);
             
+            console.log(protocolName, "reserves - Stable:", totalStable / 1e18);
+            
+
             if (totalNative > 0) {
                 uint256 rate = (totalStable * 1e18) / totalNative;
                 console.log(protocolName, "rate:", rate / 1e18);

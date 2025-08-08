@@ -351,7 +351,7 @@ contract CorrectorUnitTest is Test {
         console.log("=== Test Edge Cases ===");
         
         // Test with zero reserves
-        usdcWethPair.setReserves(0, 0);
+        usdcWethPair.setReserves(uint112(0), uint112(0));
         
         // Should handle gracefully
         (uint256 totalNative, uint256 totalStable) = corrector.getAllStableRate();
@@ -411,7 +411,7 @@ contract CorrectorUnitTest is Test {
         reserve1 = uint112(bound(reserve1, 1e15, 1000000 * 1e18));
         
         // Set new reserves
-        usdcWethPair.setReserves(reserve0, reserve1);
+        usdcWethPair.setReserves(uint112(reserve0), uint112(reserve1));
         
         // Should not revert
         (uint256 totalNative, uint256 totalStable) = corrector.getAllStableRate();
@@ -451,8 +451,8 @@ contract CorrectorUnitTest is Test {
         console.log("=== Test Mathematical Precision ===");
         
         // Test with small reserves (potential precision loss)
-        usdcWethPair.setReserves(1e15, 3000 * 1e6); // 0.001 ETH, 3000 USDC
-        usdtWethPair.setReserves(1e15, 3100 * 1e6); // 0.001 ETH, 3100 USDT
+        usdcWethPair.setReserves(uint112(1e15), uint112(3000 * 1e6)); // 0.001 ETH, 3000 USDC
+        usdtWethPair.setReserves(uint112(1e15), uint112(3100 * 1e6)); // 0.001 ETH, 3100 USDT
         
         (uint256 totalNative, uint256 totalStable) = corrector.getAllStableRate();
         
@@ -461,8 +461,8 @@ contract CorrectorUnitTest is Test {
         assertGt(totalStable, 0, "Should handle small reserves");
         
         // Test with large reserves (potential overflow)
-        usdcWethPair.setReserves(1000 ether, 3000000 * 1e6); // 1000 ETH, 3M USDC
-        usdtWethPair.setReserves(1000 ether, 3100000 * 1e6); // 1000 ETH, 3.1M USDT
+        usdcWethPair.setReserves(uint112(1000 ether), uint112(3000000 * 1e6)); // 1000 ETH, 3M USDC
+        usdtWethPair.setReserves(uint112(1000 ether), uint112(3100000 * 1e6)); // 1000 ETH, 3.1M USDT
         
         (totalNative, totalStable) = corrector.getAllStableRate();
         
@@ -480,23 +480,23 @@ contract CorrectorUnitTest is Test {
         console.log("=== Test Real World Scenarios ===");
         
         // Scenario 1: Market crash (all stable rates increase)
-        usdcWethPair.setReserves(50 ether, 300000 * 1e6); // 6000 USDC/ETH
-        usdtWethPair.setReserves(50 ether, 310000 * 1e6); // 6200 USDT/ETH
-        usdmWethPair.setReserves(50 ether, 280000 * 1e18); // 5600 USDM/ETH
+        usdcWethPair.setReserves(uint112(50 ether), uint112(300000 * 1e6)); // 6000 USDC/ETH
+        usdtWethPair.setReserves(uint112(50 ether), uint112(310000 * 1e6)); // 6200 USDT/ETH
+        usdmWethPair.setReserves(uint112(50 ether), uint112(280000 * 1e18)); // 5600 USDM/ETH
         
         corrector.correctAll();
         
         // Scenario 2: Bull market (all stable rates decrease)
-        usdcWethPair.setReserves(200 ether, 300000 * 1e6); // 1500 USDC/ETH
-        usdtWethPair.setReserves(200 ether, 310000 * 1e6); // 1550 USDT/ETH
-        usdmWethPair.setReserves(200 ether, 280000 * 1e18); // 1400 USDM/ETH
+        usdcWethPair.setReserves(uint112(200 ether), uint112(300000 * 1e6)); // 1500 USDC/ETH
+        usdtWethPair.setReserves(uint112(200 ether), uint112(310000 * 1e6)); // 1550 USDT/ETH
+        usdmWethPair.setReserves(uint112(200 ether), uint112(280000 * 1e18)); // 1400 USDM/ETH
         
         corrector.correctAll();
         
         // Scenario 3: Stable market with small deviations
-        usdcWethPair.setReserves(100 ether, 300000 * 1e6); // 3000 USDC/ETH
-        usdtWethPair.setReserves(100 ether, 305000 * 1e6); // 3050 USDT/ETH
-        usdmWethPair.setReserves(100 ether, 302500 * 1e18); // 3025 USDM/ETH
+        usdcWethPair.setReserves(uint112(100 ether), uint112(300000 * 1e6)); // 3000 USDC/ETH
+        usdtWethPair.setReserves(uint112(100 ether), uint112(305000 * 1e6)); // 3050 USDT/ETH
+        usdmWethPair.setReserves(uint112(100 ether), uint112(302500 * 1e18)); // 3025 USDM/ETH
         
         corrector.correctAll();
         

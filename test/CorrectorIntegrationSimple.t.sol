@@ -55,13 +55,13 @@ contract CorrectorIntegrationTest is Test {
     
     function _setupReserves() internal {
         // USDC/ETH: 100 ETH, 200k USDC (rate: 2000)
-        pairUSDC.setReserves(100 * PRECISION, 200000 * USDC_DECIMALS);
+        pairUSDC.setReserves(uint112(100 * PRECISION), uint112(200000 * USDC_DECIMALS));
         
         // USDT/ETH: 50 ETH, 100k USDT (rate: 2000)
-        pairUSDT.setReserves(50 * PRECISION, 100000 * USDC_DECIMALS);
+        pairUSDT.setReserves(uint112(50 * PRECISION), uint112(100000 * USDC_DECIMALS));
         
         // USDM/ETH: 25 ETH, 50k USDM (rate: 2000)
-        pairUSDM.setReserves(25 * PRECISION, 50000 * PRECISION);
+        pairUSDM.setReserves(uint112(25 * PRECISION), uint112(50000 * PRECISION));
     }
     
     function _setupCorrector() internal {
@@ -104,7 +104,7 @@ contract CorrectorIntegrationTest is Test {
         console.log("=== Test: USDM Overvalued ===");
         
         // Set USDM rate higher (2200 vs market 2000)
-        pairUSDM.setReserves(25 * PRECISION, 55000 * PRECISION);
+        pairUSDM.setReserves(uint112(25 * PRECISION), uint112(55000 * PRECISION));
         
         // Get market rate
         (uint256 totalNative, uint256 totalStable) = corrector.getAllStableRate();
@@ -128,7 +128,7 @@ contract CorrectorIntegrationTest is Test {
         console.log("=== Test: USDM Undervalued ===");
         
         // Set USDM rate lower (1800 vs market 2000)
-        pairUSDM.setReserves(25 * PRECISION, 45000 * PRECISION);
+        pairUSDM.setReserves(uint112(25 * PRECISION), uint112(45000 * PRECISION));
         
         // Get market rate
         (uint256 totalNative, uint256 totalStable) = corrector.getAllStableRate();
@@ -153,7 +153,7 @@ contract CorrectorIntegrationTest is Test {
         
         // Add another USDC pool with different rate
         MockPair pairUSDC2 = new MockPair(WETH, USDC);
-        pairUSDC2.setReserves(200 * PRECISION, 420000 * USDC_DECIMALS); // Rate: 2100
+        pairUSDC2.setReserves(uint112(200 * PRECISION), uint112(420000 * USDC_DECIMALS)); // Rate: 2100
         
         factory.setPair(WETH, USDC, address(pairUSDC2));
         corrector.addAmm(address(factory), WETH, USDC, 2, false);
@@ -194,8 +194,8 @@ contract CorrectorIntegrationTest is Test {
         console.log("=== Test: Small Numbers Precision ===");
         
         // Set very small reserves
-        pairUSDC.setReserves(1e15, 2 * 1e6); // 0.001 ETH, 2 USDC
-        pairUSDT.setReserves(1e15, 2 * 1e6); // 0.001 ETH, 2 USDT
+        pairUSDC.setReserves(uint112(1e15), uint112(2 * 1e6)); // 0.001 ETH, 2 USDC
+        pairUSDT.setReserves(uint112(1e15), uint112(2 * 1e6)); // 0.001 ETH, 2 USDT
         
         try corrector.getAllStableRate() returns (uint256 totalNative, uint256 totalStable) {
             assertGt(totalNative, 0, "Should handle small reserves");
@@ -216,7 +216,7 @@ contract CorrectorIntegrationTest is Test {
         
         console.log("=== Fuzz Test ===");
         
-        pairUSDC.setReserves(ethReserve, stableReserve);
+        pairUSDC.setReserves(uint112(ethReserve), uint112(stableReserve));
         
         try corrector.getAllStableRate() returns (uint256 totalNative, uint256 totalStable) {
             if (totalNative > 0) {

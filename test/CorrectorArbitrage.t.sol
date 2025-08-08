@@ -90,17 +90,17 @@ contract CorrectorArbitrageTest is Test {
         // USDC/ETH pool: 1000 ETH, 2M USDC (rate: 2000)
         weth.mint(address(pairUSDC), INITIAL_ETH);
         usdc.mint(address(pairUSDC), INITIAL_USDC);
-        pairUSDC.setReserves(INITIAL_ETH, INITIAL_USDC);
+        pairUSDC.setReserves(uint112(INITIAL_ETH), uint112(INITIAL_USDC));
         
         // USDT/ETH pool: 500 ETH, 1M USDT (rate: 2000)
         weth.mint(address(pairUSDT), INITIAL_ETH / 2);
         usdt.mint(address(pairUSDT), INITIAL_USDT / 2);
-        pairUSDT.setReserves(INITIAL_ETH / 2, INITIAL_USDT / 2);
+        pairUSDT.setReserves(uint112(INITIAL_ETH / 2), uint112(INITIAL_USDT / 2));
         
         // USDM/ETH pool: 100 ETH, 200k USDM (rate: 2000)
         weth.mint(address(pairUSDM), INITIAL_ETH / 10);
         usdm.mint(address(pairUSDM), 200000 * PRECISION);
-        pairUSDM.setReserves(INITIAL_ETH / 10, 200000 * PRECISION);
+        pairUSDM.setReserves(uint112(INITIAL_ETH / 10), uint112(200000 * PRECISION));
     }
     
     function _setupCorrectorPools() internal {
@@ -130,7 +130,7 @@ contract CorrectorArbitrageTest is Test {
         console.log("=== Test: Simple Arbitrage - USDM Overvalued ===");
         
         // Set USDM price higher than market average (2200 vs 2000)
-        pairUSDM.setReserves(100 * PRECISION, 220000 * PRECISION);
+        pairUSDM.setReserves(uint112(100 * PRECISION), uint112(220000 * PRECISION));
         
         // Get market average
         (uint256 totalNative, uint256 totalStable) = corrector.getAllStableRate();
@@ -161,7 +161,7 @@ contract CorrectorArbitrageTest is Test {
         console.log("=== Test: Simple Arbitrage - USDM Undervalued ===");
         
         // Set USDM price lower than market average (1800 vs 2000)
-        pairUSDM.setReserves(100 * PRECISION, 180000 * PRECISION);
+        pairUSDM.setReserves(uint112(100 * PRECISION), uint112(180000 * PRECISION));
         
         // Get market average
         (uint256 totalNative, uint256 totalStable) = corrector.getAllStableRate();
@@ -196,12 +196,12 @@ contract CorrectorArbitrageTest is Test {
         factory.setPair(address(weth), address(usdm), address(pairUSDM2));
         
         // First pool: overvalued (2200)
-        pairUSDM.setReserves(100 * PRECISION, 220000 * PRECISION);
+        pairUSDM.setReserves(uint112(100 * PRECISION), uint112(220000 * PRECISION));
         
         // Second pool: undervalued (1800)  
         weth.mint(address(pairUSDM2), 50 * PRECISION);
         usdm.mint(address(pairUSDM2), 90000 * PRECISION);
-        pairUSDM2.setReserves(50 * PRECISION, 90000 * PRECISION);
+        pairUSDM2.setReserves(uint112(50 * PRECISION), uint112(90000 * PRECISION));
         
         // Add second pool to corrector
         corrector.addAmm(address(factory), address(weth), address(usdm), 2, true);
@@ -232,7 +232,7 @@ contract CorrectorArbitrageTest is Test {
         console.log("Initial USDM:", initialUSDM / PRECISION);
         
         // Create arbitrage opportunity (USDM overvalued)
-        pairUSDM.setReserves(100 * PRECISION, 230000 * PRECISION); // Rate: 2300
+        pairUSDM.setReserves(uint112(100 * PRECISION), uint112(230000 * PRECISION)); // Rate: 2300
         
         // Manual arbitrage simulation
         // 1. Sell USDM for ETH at high rate
@@ -274,7 +274,7 @@ contract CorrectorArbitrageTest is Test {
         console.log("=== Test: Arbitrage with Slippage ===");
         
         // Small pool with high slippage
-        pairUSDM.setReserves(10 * PRECISION, 22000 * PRECISION); // Small pool
+        pairUSDM.setReserves(uint112(10 * PRECISION), uint112(22000 * PRECISION)); // Small pool
         
         uint256 tradeSize = 1000 * PRECISION; // Large trade relative to pool
         
@@ -304,7 +304,7 @@ contract CorrectorArbitrageTest is Test {
         
         // Simulate MEV bot front-running
         // 1. Detect arbitrage opportunity
-        pairUSDM.setReserves(100 * PRECISION, 250000 * PRECISION); // Rate: 2500
+        pairUSDM.setReserves(uint112(100 * PRECISION), uint112(250000 * PRECISION)); // Rate: 2500
         
         // 2. MEV bot front-runs the correction
         vm.startPrank(arbitrageur);
@@ -315,8 +315,8 @@ contract CorrectorArbitrageTest is Test {
         
         // Update reserves after front-run
         pairUSDM.setReserves(
-            105 * PRECISION, // More ETH
-            245000 * PRECISION // Less USDM
+            uint112(105 * PRECISION), // More ETH
+            uint112(245000 * PRECISION) // Less USDM
         );
         
         vm.stopPrank();
@@ -345,8 +345,8 @@ contract CorrectorArbitrageTest is Test {
         // 2. Manipulate USDM pool
         usdm.transfer(address(pairUSDM), flashLoanAmount);
         pairUSDM.setReserves(
-            80 * PRECISION, // Less ETH
-            400000 * PRECISION // More USDM - manipulated rate
+            uint112(80 * PRECISION), // Less ETH
+            uint112(400000 * PRECISION) // More USDM - manipulated rate
         );
         
         // 3. Try to trigger corrector
@@ -371,11 +371,11 @@ contract CorrectorArbitrageTest is Test {
         uint256 crashRate = 1000; // $1000 per ETH
         
         // Update all pools to reflect crash
-        pairUSDC.setReserves(INITIAL_ETH, INITIAL_USDC / 2); // Half the USDC for same ETH
-        pairUSDT.setReserves(INITIAL_ETH / 2, INITIAL_USDT / 4); // Quarter USDT
+        pairUSDC.setReserves(uint112(INITIAL_ETH), uint112(INITIAL_USDC / 2)); // Half the USDC for same ETH
+        pairUSDT.setReserves(uint112(INITIAL_ETH / 2), uint112(INITIAL_USDT / 4)); // Quarter USDT
         
         // USDM pool hasn't updated yet (arbitrage opportunity)
-        pairUSDM.setReserves(100 * PRECISION, 200000 * PRECISION); // Still at 2000
+        pairUSDM.setReserves(uint112(100 * PRECISION), uint112(200000 * PRECISION)); // Still at 2000
         
         console.log("Market crashed to $1000 per ETH");
         console.log("USDM still at $2000 per ETH");
@@ -398,7 +398,7 @@ contract CorrectorArbitrageTest is Test {
         
         // Set USDM rate based on deviation
         uint256 usdmRate = (BASE_ETH_PRICE * deviation) / 100;
-        pairUSDM.setReserves(100 * PRECISION, usdmRate * 100);
+        pairUSDM.setReserves(uint112(100 * PRECISION), uint112(usdmRate * 100));
         
         console.log("USDM rate:", usdmRate);
         console.log("Market rate:", BASE_ETH_PRICE);
@@ -418,7 +418,7 @@ contract CorrectorArbitrageTest is Test {
         console.log("=== Test: Arbitrage Gas Efficiency ===");
         
         // Create moderate arbitrage opportunity
-        pairUSDM.setReserves(100 * PRECISION, 210000 * PRECISION); // 5% premium
+        pairUSDM.setReserves(uint112(100 * PRECISION), uint112(210000 * PRECISION)); // 5% premium
         
         // Measure gas usage
         uint256 gasBefore = gasleft();

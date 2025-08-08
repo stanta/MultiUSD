@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity ^0.8.24;
 
-import {Test, console} from "forge-std/Test.sol";
+import {Test, console2, console} from "forge-std/Test.sol";
 import {Corrector} from "../src/Corrector.sol";
 import {USDM} from "../src/USDM.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
@@ -16,8 +16,8 @@ contract CorrectorAdvancedTest is Test {
     USDM public usdm;
     
     // Mainnet addresses for forking
-    address constant WETH = 0xC02aaA39b223FE8D0625B628f63C3D6297C4AF45;
-    address constant USDC = 0xA0b86a33E6c28c4c32b1c5b6a0A5E3b9b6f7c8e9;
+    address constant WETH = 0xC02AaA39B223Fe8d0625B628f63C3D6297C4af45;
+    address constant USDC = 0xA0B86a33E6c28c4c32b1c5b6a0A5E3b9b6f7c8e9;
     address constant USDT = 0xdAC17F958D2ee523a2206206994597C13D831ec7;
     address constant UNISWAP_V2_FACTORY = 0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f;
     
@@ -90,14 +90,14 @@ contract CorrectorAdvancedTest is Test {
     function _setupTestScenario() internal {
         // Set up USDC/ETH pair with 2000 USDC per ETH
         MockUniswapV2Pair(mockPairUSDC).setReserves(
-            100 * PRECISION, // 100 ETH
-            200000 * 1e6 // 200,000 USDC (6 decimals)
+            uint112(100 * PRECISION), // 100 ETH
+            uint112(200000 * 1e6) // 200,000 USDC (6 decimals)
         );
         
         // Set up USDT/ETH pair with 2000 USDT per ETH  
         MockUniswapV2Pair(mockPairUSDT).setReserves(
-            50 * PRECISION, // 50 ETH
-            100000 * 1e6 // 100,000 USDT (6 decimals)
+            uint112(50 * PRECISION), // 50 ETH
+            uint112(100000 * 1e6) // 100,000 USDT (6 decimals)
         );
         
         // Add AMM pools to corrector
@@ -144,8 +144,8 @@ contract CorrectorAdvancedTest is Test {
         
         // Set up USDM pool with higher rate (2200 USDM per ETH)
         MockUniswapV2Pair(mockPairUSDM).setReserves(
-            10 * PRECISION, // 10 ETH
-            22000 * PRECISION // 22,000 USDM (overvalued)
+            uint112(10 * PRECISION), // 10 ETH
+            uint112(22000 * PRECISION) // 22,000 USDM (overvalued)
         );
         
         // Add USDM pool
@@ -177,8 +177,8 @@ contract CorrectorAdvancedTest is Test {
         
         // Set up USDM pool with lower rate (1800 USDM per ETH)
         MockUniswapV2Pair(mockPairUSDM).setReserves(
-            10 * PRECISION, // 10 ETH
-            18000 * PRECISION // 18,000 USDM (undervalued)
+            uint112(10 * PRECISION), // 10 ETH
+            uint112(18000 * PRECISION) // 18,000 USDM (undervalued)
         );
         
         // Add USDM pool
@@ -211,8 +211,8 @@ contract CorrectorAdvancedTest is Test {
         // Add a large USDC pool
         MockUniswapV2Pair largePairUSDC = new MockUniswapV2Pair(WETH, USDC);
         largePairUSDC.setReserves(
-            1000 * PRECISION, // 1000 ETH
-            2100000 * 1e6 // 2,100,000 USDC (rate: 2100)
+            uint112(1000 * PRECISION), // 1000 ETH
+            uint112(2100000 * 1e6) // 2,100,000 USDC (rate: 2100)
         );
         
         MockUniswapV2Factory(mockFactory).setPair(WETH, USDC, address(largePairUSDC));
@@ -236,13 +236,13 @@ contract CorrectorAdvancedTest is Test {
         
         // Set up small pools
         MockUniswapV2Pair(mockPairUSDC).setReserves(
-            1e15, // 0.001 ETH
-            2 * 1e6 // 2 USDC
+            uint112(1e15), // 0.001 ETH
+            uint112(2 * 1e6) // 2 USDC
         );
         
         MockUniswapV2Pair(mockPairUSDT).setReserves(
-            1e15, // 0.001 ETH  
-            2 * 1e6 // 2 USDT
+            uint112(1e15), // 0.001 ETH  
+            uint112(2 * 1e6) // 2 USDT
         );
         
         (uint256 totalNative, uint256 totalStable) = corrector.getAllStableRate();
@@ -290,7 +290,7 @@ contract CorrectorAdvancedTest is Test {
         console.log("Stable Reserve:", stableReserve);
         
         // Set up pools with fuzzed reserves
-        MockUniswapV2Pair(mockPairUSDC).setReserves(ethReserve, stableReserve);
+        MockUniswapV2Pair(mockPairUSDC).setReserves(uint112(ethReserve), uint112(stableReserve));
         
         (uint256 totalNative, uint256 totalStable) = corrector.getAllStableRate();
         
@@ -316,8 +316,8 @@ contract CorrectorAdvancedTest is Test {
             address mockToken = address(uint160(0x1000 + i));
             MockUniswapV2Pair mockPair = new MockUniswapV2Pair(WETH, mockToken);
             mockPair.setReserves(
-                (i + 1) * PRECISION,
-                (i + 1) * 2000 * PRECISION
+                uint112((i + 1) * PRECISION),
+                uint112((i + 1) * 2000 * PRECISION)
             );
             
             MockUniswapV2Factory(mockFactory).setPair(WETH, mockToken, address(mockPair));
@@ -359,7 +359,7 @@ contract CorrectorAdvancedTest is Test {
         console.log("=== Test: Calculation Safety ===");
         
         // Test division by zero protection
-        MockUniswapV2Pair(mockPairUSDC).setReserves(0, 1000 * 1e6);
+        MockUniswapV2Pair(mockPairUSDC).setReserves(uint112(0), uint112(1000 * 1e6));
         
         try corrector.getAllStableRate() returns (uint256 totalNative, uint256) {
             if (totalNative == 0) {
@@ -370,7 +370,7 @@ contract CorrectorAdvancedTest is Test {
         }
         
         // Test with one reserve zero
-        MockUniswapV2Pair(mockPairUSDC).setReserves(100 * PRECISION, 0);
+        MockUniswapV2Pair(mockPairUSDC).setReserves(uint112(100 * PRECISION), uint112(0));
         
         try corrector.getAllStableRate() returns (uint256, uint256 totalStable) {
             if (totalStable == 0) {
