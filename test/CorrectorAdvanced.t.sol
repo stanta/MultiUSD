@@ -2,7 +2,7 @@
 pragma solidity ^0.8.24;
 
 import {Test, console2, console} from "forge-std/Test.sol";
-import {Corrector} from "../src/Corrector.sol";
+import {CorrectorV2} from "../src/CorrectorV2.sol";
 import {USDM} from "../src/USDM.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
@@ -12,7 +12,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
  * Тестирует расчет средних курсов стейблкоинов и механизм коррекции
  */
 contract CorrectorAdvancedTest is Test {
-    Corrector public corrector;
+    CorrectorV2 public corrector;
     USDM public usdm;
     
     // Mainnet addresses for forking
@@ -62,7 +62,7 @@ contract CorrectorAdvancedTest is Test {
         vm.createFork("https://rpc.ankr.com/eth");
         
         // Deploy contracts
-        corrector = new Corrector();
+        corrector = new CorrectorV2();
         usdm = new USDM();
         
         // Setup mock contracts

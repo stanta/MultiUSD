@@ -3,11 +3,11 @@ src = "src"
 out = "out"
 libs = ["lib"]
 test = "test"
+# dotenv moved to [profile.fork] to avoid implicit forking in default profile
+# dotenv = ".env.test"
 
-# RPC URLs for forking tests
-eth_rpc_url = "https://rpc.ankr.com/eth"
-bsc_rpc_url = "https://rpc.ankr.com/bsc" 
-polygon_rpc_url = "https://rpc.ankr.com/polygon"
+# RPC URLs moved to [profile.fork] to avoid implicit forking in default profile
+# For forked tests, run with: FOUNDRY_PROFILE=fork forge test
 
 # Optimizer settings
 optimizer = true
@@ -25,10 +25,25 @@ fuzz = { runs = 1000 }
 match_coverage = "src/**/*.sol"
 
 remappings = [
-  "@openzeppelin-contracts/=lib/openzeppelin-contracts/",
-  "@UniSwapV2/=lib/UniV2/",
-  "UniV2/contracts/=lib/UniV2/contracts/",
+  "UniV2/=lib/UniV2/contracts/",
   "@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/",
-  "UniSwapV2/contracts/=lib/v2-core/contracts/",
+  "forge-std/=lib/forge-std/src/",
+  "v3-core/=lib/v3-core/",
+  "@uniswap/v3-core/=lib/v3-core/",
+  "v3-periphery/=lib/v3-periphery/",
+  "@uniswap/v3-periphery/=lib/v3-periphery/",
 ]
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
+
+[profile.fork]
+dotenv = ".env.test"
+
+# RPC URLs for forking tests (inject ANKR_API_KEY from environment)
+# Ankr format: https://rpc.ankr.com/<network>/<API_KEY>
+# Base URLs in .env.test must be without trailing slash:
+#   ETH_RPC_URL=https://rpc.ankr.com/eth
+#   BSC_RPC_URL=https://rpc.ankr.com/bsc
+#   POLYGON_RPC_URL=https://rpc.ankr.com/polygon
+eth_rpc_url = "${ETH_RPC_URL}/${ANKR_API_KEY}"
+bsc_rpc_url = "${BSC_RPC_URL}/${ANKR_API_KEY}"
+polygon_rpc_url = "${POLYGON_RPC_URL}/${ANKR_API_KEY}"

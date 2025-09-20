@@ -2,15 +2,15 @@
 pragma solidity ^0.8.24;
 
 import {Test, console2, console} from "forge-std/Test.sol";
-import {Corrector} from "../src/Corrector.sol";
+import {CorrectorV2} from "../src/CorrectorV2.sol";
 import {USDM} from "../src/USDM.sol";
 
 /**
- * @title CorrectorMainnetForkTest
+ * @title CorrectorV2MainnetForkTest
  * @dev Тесты с использованием форка мейннета для реалистичных сценариев
  */
-contract CorrectorMainnetForkTest is Test {
-    Corrector public corrector;
+contract CorrectorV2MainnetForkTest is Test {
+    CorrectorV2 public corrector;
     USDM public usdm;
     
     // Ethereum mainnet addresses
@@ -47,7 +47,7 @@ contract CorrectorMainnetForkTest is Test {
         arbitrageur = makeAddr("arbitrageur");
         
         // Deploy contracts
-        corrector = new Corrector();
+        corrector = new CorrectorV2();
         usdm = new USDM();
         
         // Give ETH to test accounts
@@ -134,12 +134,12 @@ contract CorrectorMainnetForkTest is Test {
         console.log("Testing on:", chainName);
         
         // Deploy fresh contracts for each chain
-        Corrector chainCorrector = new Corrector();
+        CorrectorV2 chainCorrectorV2 = new CorrectorV2();
         
         // Note: You'd need to adjust addresses for each chain
         // This is a simplified example
         
-        try chainCorrector.getAllStableRate() returns (uint256 totalNative, uint256 totalStable) {
+        try chainCorrectorV2.getAllStableRate() returns (uint256 totalNative, uint256 totalStable) {
             console.log(chainName, "- Native reserves:", totalNative);
             console.log(chainName, "- Stable reserves:", totalStable);
         } catch {
@@ -165,10 +165,10 @@ contract CorrectorMainnetForkTest is Test {
             vm.selectFork(historicalFork);
             
             // Deploy contracts at this block
-            Corrector historicalCorrector = new Corrector();
-            historicalCorrector.addAmm(UNISWAP_V2_FACTORY, WETH, USDC, 2, false);
+            CorrectorV2 historicalCorrectorV2 = new CorrectorV2();
+            historicalCorrectorV2.addAmm(UNISWAP_V2_FACTORY, WETH, USDC, 2, false);
             
-            try historicalCorrector.getAllStableRate() returns (uint256 totalNative, uint256 totalStable) {
+            try historicalCorrectorV2.getAllStableRate() returns (uint256 totalNative, uint256 totalStable) {
                 uint256 rate = totalNative > 0 ? (totalStable * 1e18) / totalNative : 0;
                 console.log("Block", testBlocks[i], "rate:", rate / 1e18);
             } catch {
@@ -263,10 +263,10 @@ contract CorrectorMainnetForkTest is Test {
     function _testDEXProtocol(string memory protocolName, address factory) internal {
         console.log("Testing:", protocolName);
         
-        Corrector protocolCorrector = new Corrector();
-        protocolCorrector.addAmm(factory, WETH, USDC, 2, false);
+        CorrectorV2 protocolCorrectorV2 = new CorrectorV2();
+        protocolCorrectorV2.addAmm(factory, WETH, USDC, 2, false);
         
-        try protocolCorrector.getAllStableRate() returns (uint256 totalNative, uint256 totalStable) {
+        try protocolCorrectorV2.getAllStableRate() returns (uint256 totalNative, uint256 totalStable) {
             console.log(protocolName, "reserves - Native:", totalNative / 1e18);
             
             console.log(protocolName, "reserves - Stable:", totalStable / 1e18);

@@ -2,17 +2,17 @@
 pragma solidity ^0.8.24;
 
 import {Test, console} from "forge-std/Test.sol";
-import {Corrector} from "../src/Corrector.sol";
+import {CorrectorV2} from "../src/CorrectorV2.sol";
 import {USDM} from "../src/USDM.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 /**
- * @title CorrectorIntegrationTest
- * @dev Быстрые интеграционные тесты для Corrector с простыми моками
+ * @title CorrectorV2IntegrationTest
+ * @dev Быстрые интеграционные тесты для CorrectorV2 с простыми моками
  * Тестирует расчет средних курсов стейблкоинов и арбитражные операции USDM
  */
-contract CorrectorIntegrationTest is Test {
-    Corrector public corrector;
+contract CorrectorV2IntegrationTest is Test {
+    CorrectorV2 public corrector;
     USDM public usdm;
     
     // Mock factory and pairs for testing
@@ -32,7 +32,7 @@ contract CorrectorIntegrationTest is Test {
     
     function setUp() public {
         // Deploy contracts
-        corrector = new Corrector();
+        corrector = new CorrectorV2();
         usdm = new USDM();
         factory = new MockFactory();
         
@@ -50,7 +50,7 @@ contract CorrectorIntegrationTest is Test {
         _setupReserves();
         
         // Configure corrector
-        _setupCorrector();
+        _setupCorrectorV2();
     }
     
     function _setupReserves() internal {
@@ -64,7 +64,7 @@ contract CorrectorIntegrationTest is Test {
         pairUSDM.setReserves(uint112(25 * PRECISION), uint112(50000 * PRECISION));
     }
     
-    function _setupCorrector() internal {
+    function _setupCorrectorV2() internal {
         // Add stablecoin pools
         corrector.addAmm(address(factory), WETH, USDC, 2, false);
         corrector.addAmm(address(factory), WETH, USDT, 2, false);

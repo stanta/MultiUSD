@@ -2,19 +2,19 @@
 pragma solidity ^0.8.24;
 
 import {Test, console} from "forge-std/Test.sol";
-import {Corrector} from "../src/Corrector.sol";
+import {CorrectorV2} from "../src/CorrectorV2.sol";
 import {USDM} from "../src/USDM.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "UniV2/interfaces/IUniswapV2Pair.sol"; 
 import "UniV2/interfaces/IUniswapV2Factory.sol";
 
 /**
- * @title CorrectorIntegrationTest
- * @dev Интеграционные тесты для Corrector с использованием форка мейннета
+ * @title CorrectorV2IntegrationTest
+ * @dev Интеграционные тесты для CorrectorV2 с использованием форка мейннета
  * Тестирует расчет средних курсов стейблкоинов и арбитражные операции USDM
  */
-contract CorrectorIntegrationTest is Test {
-    Corrector public corrector;
+contract CorrectorV2IntegrationTest is Test {
+    CorrectorV2 public corrector;
     USDM public usdm;
     
     // Mainnet addresses - Ethereum
@@ -59,7 +59,7 @@ contract CorrectorIntegrationTest is Test {
         trader2 = makeAddr("trader2");
         
         // Deploy contracts
-        corrector = new Corrector();
+        corrector = new CorrectorV2();
         usdm = new USDM();
         
         // Setup initial balances

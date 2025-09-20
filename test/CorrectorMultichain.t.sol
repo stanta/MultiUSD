@@ -2,7 +2,7 @@
 pragma solidity ^0.8.24;
 
 import {Test, console} from "forge-std/Test.sol";
-import {Corrector} from "../src/Corrector.sol";
+import {CorrectorV2} from "../src/CorrectorV2.sol";
 import {USDM} from "../src/USDM.sol";
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
@@ -10,11 +10,11 @@ import "UniV2/interfaces/IUniswapV2Pair.sol";
 import "UniV2/interfaces/IUniswapV2Factory.sol";
 
 /**
- * @title CorrectorMultichainTest
+ * @title CorrectorV2MultichainTest
  * @dev Тесты для различных блокчейн сетей
  */
-contract CorrectorMultichainTest is Test {
-    Corrector public corrector;
+contract CorrectorV2MultichainTest is Test {
+    CorrectorV2 public corrector;
     USDM public usdm;
     
     // Network configurations
@@ -38,7 +38,7 @@ contract CorrectorMultichainTest is Test {
         trader = makeAddr("trader");
         
         // Deploy contracts
-        corrector = new Corrector();
+        corrector = new CorrectorV2();
         usdm = new USDM();
     }
 

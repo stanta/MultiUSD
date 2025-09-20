@@ -122,7 +122,10 @@ contract CorrectorV3 is Ownable {
         uint24 fee
     ) internal view returns (uint256 reserveNative, uint256 reserveStable) {
         address pool = _getPool(ammFactory, tokenNative, tokenStable, fee);
-        require(pool != address(0), "Pool not found");
+        if (pool == address(0)) {
+            // No pool yet: treat reserves as zero so aggregate queries don't revert
+            return (0, 0);
+        }
 
         address token0 = IUniswapV3Pool(pool).token0();
         address token1 = IUniswapV3Pool(pool).token1();
@@ -139,10 +142,11 @@ contract CorrectorV3 is Ownable {
         }
     }
 
-    // Aggregate reserves across all active AMMs with version == 3
+    // Aggregate reserves across all active non-USDM AMMs with version == 3
+    // Note: mirrors V2 tests' expectation to exclude USDM pools from average market rate computation
     function getAllStableRateV3() public view returns (uint256 allReserveNative, uint256 allReserveStable) {
         for (uint256 i = 0; i < amms.length; i++) {
-            if (amms[i].isActive && amms[i].version == 3) {
+            if (amms[i].isActive && amms[i].version == 3 && !amms[i].isUSDM) {
                 (uint256 rn, uint256 rs) = getReservesV3(
                     amms[i].ammAddress,
                     amms[i].tokenNative,
@@ -193,6 +197,10 @@ contract CorrectorV3 is Ownable {
             if (allReserveNative > allReserveStable) {
                 // averageSwapRate = allReserveNative / allReserveStable
                 uint256 averageSwapRate = allReserveNative / allReserveStable;
+                if (averageSwapRate == 0) {
+                    // avoid divisions by zero and unstable math
+                    continue;
+                }
 
                 // amountTobeNative = reserveStable * averageSwapRate
                 uint256 amountTobeNative = reserveStable * averageSwapRate;
@@ -200,16 +208,19 @@ contract CorrectorV3 is Ownable {
                 if (amountTobeNative > reserveNative) {
                     uint256 needNative = amountTobeNative - reserveNative;
                     // reserveStable - reserveNative / averageSwapRate
-                    uint256 giveStable = reserveStable - (reserveNative / averageSwapRate);
+                    uint256 giveStable = reserveStable > (reserveNative / averageSwapRate)
+                        ? (reserveStable - (reserveNative / averageSwapRate))
+                        : 0;
 
                     // Interpret as inputs to the pool (what we should add)
                     amountInNative[i] = needNative;
                     amountInStable[i] = giveStable;
                 } else {
-                    // amountToSwapNative = amountTobeNative - reserveNative (will underflow if smaller; guard)
-                    // amountToSwapUSDM = reserveNative / averageSwapRate - reserveStable
+                    // amountToSwapNative = reserveNative - amountTobeNative
                     uint256 lessNative = reserveNative - amountTobeNative;
-                    uint256 needStable = (reserveNative / averageSwapRate) - reserveStable;
+                    // amountToSwapUSDM = reserveNative / averageSwapRate - reserveStable
+                    uint256 rv = (reserveNative / averageSwapRate);
+                    uint256 needStable = rv > reserveStable ? (rv - reserveStable) : 0;
 
                     amountInNative[i] = lessNative;    // move native towards target
                     amountInStable[i] = needStable;    // and stable towards target
@@ -217,6 +228,10 @@ contract CorrectorV3 is Ownable {
             } else {
                 // averageSwapRate = allReserveStable / allReserveNative
                 uint256 averageSwapRate = allReserveStable / allReserveNative;
+                if (averageSwapRate == 0) {
+                    // avoid divisions by zero and unstable math
+                    continue;
+                }
 
                 // amountTobeStable = reserveNative * averageSwapRate
                 uint256 amountTobeStable = reserveNative * averageSwapRate;
@@ -224,15 +239,17 @@ contract CorrectorV3 is Ownable {
                 if (amountTobeStable > reserveStable) {
                     uint256 needStable = amountTobeStable - reserveStable;
                     // reserveNative - reserveStable / averageSwapRate
-                    uint256 giveNative = reserveNative - (reserveStable / averageSwapRate);
+                    uint256 rv = (reserveStable / averageSwapRate);
+                    uint256 giveNative = reserveNative > rv ? (reserveNative - rv) : 0;
 
                     amountInNative[i] = giveNative;
                     amountInStable[i] = needStable;
                 } else {
-                    // amountToSwapUSDM = amountTobeStable - reserveStable (guard for underflow)
-                    // amountToSwapNative = reserveStable / averageSwapRate - reserveNative
+                    // amountToSwapUSDM = reserveStable - amountTobeStable
                     uint256 lessStable = reserveStable - amountTobeStable;
-                    uint256 needNative = (reserveStable / averageSwapRate) - reserveNative;
+                    // amountToSwapNative = reserveStable / averageSwapRate - reserveNative
+                    uint256 rv = (reserveStable / averageSwapRate);
+                    uint256 needNative = rv > reserveNative ? (rv - reserveNative) : 0;
 
                     amountInNative[i] = needNative;
                     amountInStable[i] = lessStable;

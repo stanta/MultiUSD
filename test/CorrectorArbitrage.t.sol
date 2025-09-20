@@ -2,15 +2,15 @@
 pragma solidity ^0.8.24;
 
 import {Test, console} from "forge-std/Test.sol";
-import {Corrector} from "../src/Corrector.sol";
+import {CorrectorV2} from "../src/CorrectorV2.sol";
 import {USDM} from "../src/USDM.sol";
 
 /**
- * @title CorrectorArbitrageTest
+ * @title CorrectorV2ArbitrageTest
  * @dev Специализированные тесты для арбитражных стратегий USDM
  */
-contract CorrectorArbitrageTest is Test {
-    Corrector public corrector;
+contract CorrectorV2ArbitrageTest is Test {
+    CorrectorV2 public corrector;
     USDM public usdm;
     
     // Test contracts and addresses
@@ -62,7 +62,7 @@ contract CorrectorArbitrageTest is Test {
         usdt = new MockERC20("USDT", "USDT", 6);
         
         // Deploy contracts
-        corrector = new Corrector();
+        corrector = new CorrectorV2();
         usdm = new USDM();
         factory = new MockUniswapV2Factory();
         
@@ -80,7 +80,7 @@ contract CorrectorArbitrageTest is Test {
         _setupInitialLiquidity();
         
         // Configure corrector
-        _setupCorrectorPools();
+        _setupCorrectorV2Pools();
         
         // Give tokens to test accounts
         _distributeTokens();
@@ -103,7 +103,7 @@ contract CorrectorArbitrageTest is Test {
         pairUSDM.setReserves(uint112(INITIAL_ETH / 10), uint112(200000 * PRECISION));
     }
     
-    function _setupCorrectorPools() internal {
+    function _setupCorrectorV2Pools() internal {
         // Add external stablecoin pools
         corrector.addAmm(address(factory), address(weth), address(usdc), 2, false);
         corrector.addAmm(address(factory), address(weth), address(usdt), 2, false);
