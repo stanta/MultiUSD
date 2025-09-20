@@ -7,3 +7,9 @@
 [submodule "lib/UniV2"]
 	path = lib/UniV2
 	url = https://github.com/Uniswap/v2-core/
+[submodule "lib/v3-core"]
+	path = lib/v3-core
+	url = https://github.com/Uniswap/v3-core
+[submodule "lib/v3-periphery"]
+	path = lib/v3-periphery
+	url = https://github.com/Uniswap/v3-periphery
