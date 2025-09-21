@@ -3,11 +3,10 @@ src = "src"
 out = "out"
 libs = ["lib"]
 test = "test"
-# dotenv moved to [profile.fork] to avoid implicit forking in default profile
-# dotenv = ".env.test"
 
-# RPC URLs moved to [profile.fork] to avoid implicit forking in default profile
-# For forked tests, run with: FOUNDRY_PROFILE=fork forge test
+eth_rpc_url = "https://ethereum-rpc.publicnode.com"
+bsc_rpc_url = "https://bsc-rpc.publicnode.com"
+polygon_rpc_url = "https://polygon-rpc.publicnode.com"
 
 # Optimizer settings
 optimizer = true
@@ -34,16 +33,3 @@ remappings = [
   "@uniswap/v3-periphery/=lib/v3-periphery/",
 ]
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
-
-[profile.fork]
-dotenv = ".env.test"
-
-# RPC URLs for forking tests (inject ANKR_API_KEY from environment)
-# Ankr format: https://rpc.ankr.com/<network>/<API_KEY>
-# Base URLs in .env.test must be without trailing slash:
-#   ETH_RPC_URL=https://rpc.ankr.com/eth
-#   BSC_RPC_URL=https://rpc.ankr.com/bsc
-#   POLYGON_RPC_URL=https://rpc.ankr.com/polygon
-eth_rpc_url = "${ETH_RPC_URL}/${ANKR_API_KEY}"
-bsc_rpc_url = "${BSC_RPC_URL}/${ANKR_API_KEY}"
-polygon_rpc_url = "${POLYGON_RPC_URL}/${ANKR_API_KEY}"

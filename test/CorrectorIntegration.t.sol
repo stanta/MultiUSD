@@ -51,7 +51,7 @@ contract CorrectorV2IntegrationTest is Test {
 
     function setUp() public {
         // Fork mainnet at specific block
-        vm.createFork("https://rpc.ankr.com/eth", 18500000);
+        vm.createFork(vm.envString("ETH_RPC_URL"), 18500000);
         vm.selectFork(0);
         
         // Create test addresses

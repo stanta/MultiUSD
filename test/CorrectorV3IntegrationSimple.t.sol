@@ -94,10 +94,10 @@ contract CorrectorV3IntegrationSimpleTest is Test {
         corrector.addAmm(address(factory), address(weth), address(usdm), FEE_3000, 3, true);
 
         // seed reserves: USDC/ETH: 100 ETH, 200k USDC
-        weth.mint(address(this), 10_000_000 ether);
-        usdc.mint(address(this), 10_000_000_000_000);
-        usdt.mint(address(this), 10_000_000_000_000);
-        usdm.mint(address(this), 10_000_000 ether);
+        weth.mint(address(this), 1_000_000 ether);
+        usdc.mint(address(this), 1_000_000_000_000);
+        usdt.mint(address(this), 1_000_000_000_000);
+        usdm.mint(address(this), 1_000_000 ether);
 
         weth.transfer(poolUSDC, 100 ether);
         usdc.transfer(poolUSDC, 200_000 * USDC_DECIMALS);
@@ -162,7 +162,7 @@ contract CorrectorV3IntegrationSimpleTest is Test {
 
         // seed bigger pool: 1000 ETH, 2.1M USDC (rate ~ 2100)
         weth.transfer(bigUSDC, 1000 ether);
-        usdc.transfer(bigUSDC, 2_100_000 * USDC_DECIMALS);
+        usdc.mint(bigUSDC, 2_100_000 * USDC_DECIMALS);
 
         (uint256 totalNative, uint256 totalStable) = corrector.getAllStableRateV3();
         uint256 weightedAvg = (totalStable * PRECISION) / totalNative;

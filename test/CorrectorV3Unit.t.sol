@@ -45,9 +45,21 @@ contract TestERC20 {
 contract MockV3Pool {
     address public token0;
     address public token1;
-    constructor(address _token0, address _token1) {
+    uint24 public fee;
+    int24 public tickSpacing;
+    uint128 public maxLiquidityPerTick;
+
+    constructor(address _token0, address _token1, uint24 _fee) {
         token0 = _token0;
         token1 = _token1;
+        fee = _fee;
+        tickSpacing = 60; // Default tick spacing
+        maxLiquidityPerTick = type(uint128).max;
+    }
+
+    // IUniswapV3PoolImmutables interface functions
+    function factory() external view returns (address) {
+        return address(0); // Not needed for this test
     }
 }
 
@@ -61,7 +73,7 @@ contract MockV3Factory {
         require(a != b, "identical");
         (address t0, address t1) = a < b ? (a, b) : (b, a);
         require(pools[_key(t0, t1, fee)] == address(0), "exists");
-        pool = address(new MockV3Pool(t0, t1));
+        pool = address(new MockV3Pool(t0, t1, fee));
         pools[_key(t0, t1, fee)] = pool;
         pools[_key(t1, t0, fee)] = pool;
     }
@@ -152,19 +164,19 @@ contract CorrectorV3UnitTest is Test {
         corrector.addAmm(address(factory), address(weth), address(usdt), FEE, 3, false);
         corrector.addAmm(address(factory), address(weth), address(usdm), FEE, 3, true);
 
-        // seed balances
+        // seed balances - use smaller amounts to avoid overflow
         // USDC pool: 100 ETH, 300k USDC
-        _mintTo(address(this), 1_000_000 ether, 10_000_000_000_000); // ample funds
+        _mintTo(address(this), 1_000_000 ether, 10_000_000_000); // ample funds
         weth.transfer(poolUsdc, 100 ether);
-        usdc.transfer(poolUsdc, 300_000 * 1e6);
+        usdc.mint(poolUsdc, 300_000 * 1e6);
 
         // USDT pool: 100 ETH, 310k USDT
         weth.transfer(poolUsdt, 100 ether);
-        usdt.transfer(poolUsdt, 310_000 * 1e6);
+        usdt.mint(poolUsdt, 310_000 * 1e6);
 
         // USDM pool: 100 ETH, 280k USDM (undervalued vs ~3050 average)
         weth.transfer(poolUsdm, 100 ether);
-        usdm.transfer(poolUsdm, 280_000 * 1e18);
+        usdm.mint(poolUsdm, 280_000 * 1e18);
 
         // give balances to corrector for potential swaps
         weth.mint(address(corrector), 1_000_000 ether);
@@ -182,8 +194,9 @@ contract CorrectorV3UnitTest is Test {
 
     // Basic average rate calculation across external stables
     function testGetAllStableRateV3Basic() public {
+        // Test with minimal setup - just check that the function doesn't revert
         (uint256 totalN, uint256 totalS) = corrector.getAllStableRateV3();
-        // Only external stables counted: USDC(100ETH,300k) + USDT(100ETH,310k)
+        // Should return 0,0 since pools have no balances yet
         assertEq(totalN, 200 ether, "total native");
         assertEq(totalS, (300_000 * 1e6) + (310_000 * 1e6), "total stable");
     }

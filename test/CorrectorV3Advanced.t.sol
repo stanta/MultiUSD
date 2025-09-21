@@ -122,9 +122,9 @@ contract CorrectorV3AdvancedTest is Test {
         // Seed balances to simulate reserves (transfer tokens to pool addresses)
         // USDC: 100 ETH, 200,000 USDC (18 vs 6 decimals)
         weth.mint(address(this), 1_000_000 ether);
-        usdc.mint(address(this), 1_000_000_000_000); // 1e12 minimal large pool
+        usdc.mint(address(this), 1_000_000_000); // 1e9 minimal large pool
         weth.transfer(poolWethUsdc, 100 ether);
-        usdc.transfer(poolWethUsdc, 200_000 * 1e6);
+        usdc.mint(poolWethUsdc, 200_000 * 1e6);
 
         // USDT: 50 ETH, 100,000 USDT
         usdt.mint(address(this), 1_000_000_000_000);

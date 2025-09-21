@@ -53,7 +53,7 @@ contract CorrectorV2MultichainTest is Test {
             usdt: 0xdAC17F958D2ee523a2206206994597C13D831ec7,
             uniswapFactory: 0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f,
             forkBlock: 18500000,
-            rpcUrl: "https://rpc.ankr.com/eth"
+            rpcUrl: vm.envString("ETH_RPC_URL")
         }));
         
         _runStandardTests();
@@ -70,7 +70,7 @@ contract CorrectorV2MultichainTest is Test {
             usdt: 0x55d398326f99059fF775485246999027B3197955,
             uniswapFactory: 0xcA143Ce32Fe78f1f7019d7d551a6402fC5350c73, // PancakeSwap
             forkBlock: 35000000,
-            rpcUrl: "https://rpc.ankr.com/bsc"
+            rpcUrl: vm.envString("BSC_RPC_URL")
         }));
         
         _runStandardTests();
@@ -87,7 +87,7 @@ contract CorrectorV2MultichainTest is Test {
             usdt: 0xc2132D05D31c914a87C6611C10748AEb04B58e8F,
             uniswapFactory: 0x5757371414417b8C6CAad45bAeF941aBc7d3Ab32, // QuickSwap
             forkBlock: 50000000,
-            rpcUrl: "https://rpc.ankr.com/polygon"
+            rpcUrl: vm.envString("POLYGON_RPC_URL")
         }));
         
         _runStandardTests();
@@ -256,7 +256,7 @@ contract CorrectorV2MultichainTest is Test {
             console.log("Testing block:", testBlocks[i]);
             
             // Create fork at specific block
-            vm.createFork("https://rpc.ankr.com/eth", testBlocks[i]);
+            vm.createFork(vm.envString("ETH_RPC_URL"), testBlocks[i]);
             vm.selectFork(i + 1);
             
             // Test rate calculation at this block
@@ -296,7 +296,7 @@ contract CorrectorV2MultichainTest is Test {
         // Example: Test during May 2022 Terra collapse
         uint256 volatileBlock = 14720000; // Around Terra collapse
         
-        vm.createFork("https://rpc.ankr.com/eth", volatileBlock);
+        vm.createFork(vm.envString("ETH_RPC_URL"), volatileBlock);
         vm.selectFork(1);
         
         // Test system behavior during extreme conditions

@@ -35,9 +35,9 @@ contract CorrectorV2MainnetForkTest is Test {
     
     function setUp() public {
         // Create forks for different networks
-        ethFork = vm.createFork("https://rpc.ankr.com/eth");
-        bscFork = vm.createFork("https://rpc.ankr.com/bsc");
-        polygonFork = vm.createFork("https://rpc.ankr.com/polygon");
+        ethFork = vm.createFork(vm.envString("ETH_RPC_URL"));
+        bscFork = vm.createFork(vm.envString("BSC_RPC_URL"));
+        polygonFork = vm.createFork(vm.envString("POLYGON_RPC_URL"));
         
         // Start with Ethereum fork
         vm.selectFork(ethFork);
@@ -161,7 +161,7 @@ contract CorrectorV2MainnetForkTest is Test {
         
         for (uint i = 0; i < testBlocks.length; i++) {
             // Create fork at specific block
-            uint256 historicalFork = vm.createFork("https://rpc.ankr.com/eth", testBlocks[i]);
+            uint256 historicalFork = vm.createFork(vm.envString("ETH_RPC_URL"), testBlocks[i]);
             vm.selectFork(historicalFork);
             
             // Deploy contracts at this block

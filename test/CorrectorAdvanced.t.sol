@@ -59,7 +59,7 @@ contract CorrectorAdvancedTest is Test {
         user1 = makeAddr("user1");
         
         // Fork mainnet for realistic testing
-        vm.createFork("https://rpc.ankr.com/eth");
+        vm.createFork(vm.envString("ETH_RPC_URL"));
         
         // Deploy contracts
         corrector = new CorrectorV2();
