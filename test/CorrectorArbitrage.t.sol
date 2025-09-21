@@ -245,8 +245,11 @@ contract CorrectorV2ArbitrageTest is Test {
             230000 * PRECISION,
             100 * PRECISION
         );
-        
-        weth.transferFrom(address(pairUSDM), arbitrageur, ethReceived);
+
+        // Simulate receiving ETH from the swap
+        vm.startPrank(address(pairUSDM));
+        weth.transfer(arbitrageur, ethReceived);
+        vm.stopPrank();
         
         // 2. Buy USDM back at market rate from other pools
         // (This would involve more complex multi-pool trading)
@@ -281,8 +284,8 @@ contract CorrectorV2ArbitrageTest is Test {
         // Calculate price impact
         uint256 priceImpact = _calculatePriceImpact(
             tradeSize,
-            22000 * PRECISION,
-            10 * PRECISION
+            10 * PRECISION,
+            22000 * PRECISION
         );
         
         console.log("Trade size:", tradeSize / PRECISION);
@@ -356,6 +359,9 @@ contract CorrectorV2ArbitrageTest is Test {
         vm.stopPrank();
         
         // 4. Repay flash loan
+        vm.startPrank(arbitrageur);
+        usdm.approve(address(this), flashLoanAmount);
+        vm.stopPrank();
         usdm.burnFrom(arbitrageur, flashLoanAmount);
         
         console.log("Flash loan protection tested");

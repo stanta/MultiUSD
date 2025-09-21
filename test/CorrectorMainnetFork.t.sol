@@ -308,7 +308,7 @@ contract CorrectorV2MainnetForkTest is Test {
     /**
      * @dev Тест восстановления после сбоев
      */
-    function testFailureRecovery() public {
+    function testRecovery() public {
         console.log("=== Testing Failure Recovery ===");
         
         vm.selectFork(ethFork);

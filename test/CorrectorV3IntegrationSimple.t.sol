@@ -116,8 +116,8 @@ contract CorrectorV3IntegrationSimpleTest is Test {
         (uint256 totalNative, uint256 totalStable) = corrector.getAllStableRateV3();
         // Expected native: 100 + 50 = 150 ETH
         assertEq(totalNative, 150 ether, "native total mismatch");
-        // Expected stable: 200k + 100k (unit sums, decimals preserved)
-        assertEq(totalStable, (200_000 * USDC_DECIMALS) + (100_000 * USDC_DECIMALS), "stable total mismatch");
+        // Expected stable: 200k + 100k (scaled to 18 decimals)
+        assertEq(totalStable, (200_000 * USDC_DECIMALS * 1e12) + (100_000 * USDC_DECIMALS * 1e12), "stable total mismatch");
 
         // Derived average (informational)
         uint256 avg = (totalStable * PRECISION) / totalNative;

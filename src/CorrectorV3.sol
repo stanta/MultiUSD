@@ -2,6 +2,7 @@
 pragma solidity ^0.8.24;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "v3-core/contracts/interfaces/IUniswapV3Factory.sol";
 import "v3-core/contracts/interfaces/IUniswapV3Pool.sol";
@@ -157,7 +158,22 @@ contract CorrectorV3 is Ownable {
                     amms[i].fee
                 );
                 allReserveNative += rn;
-                allReserveStable += rs;
+                // Normalize external stable reserves to 18 decimals for consistent aggregation
+                uint256 stableAdj;
+                if (amms[i].tokenStable.code.length > 0) {
+                    try IERC20Metadata(amms[i].tokenStable).decimals() returns (uint8 dec) {
+                        if (dec <= 18) {
+                            stableAdj = rs * 10**(18 - dec);
+                        } else {
+                            stableAdj = rs / 10**(dec - 18);
+                        }
+                    } catch {
+                        stableAdj = rs * 1e12; // fallback assume 6 decimals
+                    }
+                } else {
+                    stableAdj = rs * 1e12; // sentinel address, assume 6 decimals
+                }
+                allReserveStable += stableAdj;
             }
         }
 
@@ -172,7 +188,22 @@ contract CorrectorV3 is Ownable {
                         amms[i].fee
                     );
                     allReserveNative += rn;
-                    allReserveStable += rs;
+                    // Normalize stable reserves to 18 decimals
+                    uint256 stableAdj;
+                    if (amms[i].tokenStable.code.length > 0) {
+                        try IERC20Metadata(amms[i].tokenStable).decimals() returns (uint8 dec) {
+                            if (dec <= 18) {
+                                stableAdj = rs * 10**(18 - dec);
+                            } else {
+                                stableAdj = rs / 10**(dec - 18);
+                            }
+                        } catch {
+                            stableAdj = rs * 1e12; // fallback assume 6 decimals
+                        }
+                    } else {
+                        stableAdj = rs * 1e12; // sentinel address, assume 6 decimals
+                    }
+                    allReserveStable += stableAdj;
                 }
             }
         }

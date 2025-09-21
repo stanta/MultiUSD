@@ -196,9 +196,9 @@ contract CorrectorV3UnitTest is Test {
     function testGetAllStableRateV3Basic() public {
         // Test with minimal setup - just check that the function doesn't revert
         (uint256 totalN, uint256 totalS) = corrector.getAllStableRateV3();
-        // Should return 0,0 since pools have no balances yet
+        // Should return scaled values
         assertEq(totalN, 200 ether, "total native");
-        assertEq(totalS, (300_000 * 1e6) + (310_000 * 1e6), "total stable");
+        assertEq(totalS, ((300_000 * 1e6) + (310_000 * 1e6)) * 1e12, "total stable");
     }
 
     // USDM undervalued: rate lower than average -> plan corrections should compute suggestions
@@ -232,7 +232,7 @@ contract CorrectorV3UnitTest is Test {
         corrector.setAMMactive(address(factory), true);
         (uint256 nBack, uint256 sBack) = corrector.getAllStableRateV3();
         assertEq(nBack, 200 ether);
-        assertEq(sBack, (300_000 * 1e6) + (310_000 * 1e6));
+        assertEq(sBack, ((300_000 * 1e6) + (310_000 * 1e6)) * 1e12);
     }
 
     // Edge cases: zero reserves on one pool should not revert; getReservesV3 returns (0,0) if pool missing
@@ -241,7 +241,7 @@ contract CorrectorV3UnitTest is Test {
         corrector.addAmm(address(factory), address(weth), address(usdc), 500, 3, false);
         (uint256 tn, uint256 ts) = corrector.getAllStableRateV3();
         assertEq(tn, 200 ether);
-        assertEq(ts, (300_000 * 1e6) + (310_000 * 1e6));
+        assertEq(ts, ((300_000 * 1e6) + (310_000 * 1e6)) * 1e12);
     }
 
     // Fuzz: add a temp pool with random reserves and ensure aggregation doesn't revert
@@ -256,7 +256,7 @@ contract CorrectorV3UnitTest is Test {
 
         (uint256 allN, uint256 allS) = corrector.getAllStableRateV3();
         assertGt(allN, 200 ether); // new pool adds reserves
-        assertGt(allS, (300_000 * 1e6) + (310_000 * 1e6));
+        assertGt(allS, ((300_000 * 1e6) + (310_000 * 1e6)) * 1e12);
     }
 
     // Performance: many pools

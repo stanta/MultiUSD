@@ -101,7 +101,7 @@ contract CorrectorV3ArbitrageTest is Test {
 
         // seed pool balances
         // USDC pool: 100 ETH, 2,000,000 USDC (rate ~ 2000)
-        _mintTo(address(this), 1_000_000 ether, 1_000_000_000_000);
+        _mintTo(address(this), 1_000_000 ether, 10_000_000 * PRECISION);
         weth.transfer(poolUsdc, 100 ether);
         usdc.mint(poolUsdc, 2_000_000 * USDC_DECIMALS);
 
